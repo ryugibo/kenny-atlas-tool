@@ -28,9 +28,9 @@ img = Image.open(inputimage_filename)
 real_input_image_filename = os.path.split(inputimage_filename)[-1]
 
 o = {}
-o["frames"] = []
+o["frames"] = {}
 o["meta"] = {
-	"app" : "tonyapp", # feel freeeee to change this
+	"app" : "Adobe Flash CS6", # feel freeeee to change this
 	"version" : "1.0",
 	"image" : real_input_image_filename,
 	"size" : { "w" : image_w, "h" : image_h }
@@ -42,7 +42,6 @@ root = tree.getroot()
 for child in root:
 	if child.tag == "SubTexture":
 		tmp = {}
-		tmp["filename"] = child.attrib["name"]
 		tmp["frame"] = { 
 			"x" : int(child.attrib["x"]),
 			"y" : int(child.attrib["y"]),
@@ -54,6 +53,7 @@ for child in root:
 		tmp["spriteSourceSize"] = tmp["frame"]
 		tmp["sourceSize"] = { "w" : int(child.attrib["width"]), 
 			"h" : int(child.attrib["height"]) }
-		o["frames"].append(tmp)
+                tmp["pivot"] = { "x" : 0.5, "y" : 0.5 }
+                o["frames"][child.attrib["name"]] = tmp;
 
 print(json.dumps(o))
