@@ -7,7 +7,12 @@
 	usage produce-kenny-atlas.py -i <xml file> -p <png file>
 """
 
-import sys, json, argparse, os
+import sys, json, argparse, os, io
+
+try:
+    to_unicode = unicode
+except NameError:
+    to_unicode = str
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", required=True)
@@ -26,6 +31,7 @@ img = Image.open(inputimage_filename)
 (image_w,image_h) = img.size
 
 real_input_image_filename = os.path.split(inputimage_filename)[-1]
+filename_without_ext = os.path.splitext(inputimage_filename)[0]
 
 o = {}
 o["frames"] = {}
@@ -51,9 +57,13 @@ for child in root:
 		tmp["rotated"] = False
 		tmp["trimmed"] = False
 		tmp["spriteSourceSize"] = tmp["frame"]
-		tmp["sourceSize"] = { "w" : int(child.attrib["width"]), 
-			"h" : int(child.attrib["height"]) }
-                tmp["pivot"] = { "x" : 0.5, "y" : 0.5 }
-                o["frames"][child.attrib["name"]] = tmp;
+		tmp["sourceSize"] = { "w" : int(child.attrib["width"]), "h" : int(child.attrib["height"]) }
+		tmp["pivot"] = { "x" : 0.5, "y" : 0.5 }
+		o["frames"][child.attrib["name"]] = tmp;
 
-print(json.dumps(o))
+output_json = json.dumps(o, ensure_ascii=False)
+
+with io.open(filename_without_ext + ".json", 'w', encoding='utf-8') as outfile:
+	outfile.write(to_unicode(output_json));
+
+print(output_json)
